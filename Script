@@ -1,0 +1,44 @@
+rem ## Enter your IPv4 DNS Server IP addresses where indicated and run script with administrative privileges.
+
+@ECHO OFF
+
+set vardns1=Primary DNS IP Address Here
+set vardns2=Secondary DNS IP Address Here
+
+
+ECHO Setting Primary DNS
+netsh int ip set dns name = "Local Area Connection" source = static addr = %vardns1%
+
+ECHO Setting Secondary DNS
+netsh int ip add dns name = "Local Area Connection" addr = %vardns2%
+
+ipconfig /flushdns
+
+exit
+
+###################################################
+
+Set-DnsClientServerAddress -InterfaceAlias Wi-Fi -ServerAddresses "1.1.1.1","2.2.2.2"
+
+@echo off
+if (%1)==() goto error
+if (%2)==() goto error
+if (%3)==() goto error
+
+:DNS1stServerSetup
+netsh int ip set dns name = "%1" source = static addr = %2%
+if errorlevel 1 goto end
+goto end
+
+:DNS2ndServerSetup
+netsh int ip set dns name = "%1" source = static addr = %3%
+if errorlevel 1 goto end
+goto end
+
+:error
+Echo Error was detected.  You must use 3 commandline paramaters.  One for NIC Name,Second for 1st DNS server and Third for 2nd DNS server
+goto end
+
+:end
+##########################
+
